@@ -1,0 +1,90 @@
+[tool.poetry]
+name = "chessonline"
+version = "0.1.0"
+description = ""
+authors = ["spideyzac <zacmlesser-7@outlook.com>"]
+license = "MIT"
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.10.0"
+pylint = "^3.3.1"
+mypy = "^1.13.0"
+isort = "^5.13.2"
+poethepoet = "^0.31.0"
+
+[tool.poe.tasks]
+lint = "pylint ./src/**/*.py"
+imports = "isort ./src --check"
+types = "mypy ./src/**/*.py"
+format = "black --check ./src/**/*.py"
+start = "python ./src/main.py"
+
+[tool.poe.tasks.check]
+sequence = ["lint", "imports", "types", "format"]
+
+[tool.isort]
+profile = "black"
+
+[tool.black]
+line-length = 90
+
+[tool.mypy]
+check_untyped_defs = true
+
+[tool.pylint.MASTER]
+ignore-patterns = "^(?!.*\\.py$).*"
+load-plugins = [
+    "pylint.extensions.check_elif",
+    "pylint.extensions.bad_builtin",
+    "pylint.extensions.docparams",
+    "pylint.extensions.for_any_all",
+    "pylint.extensions.set_membership",
+    "pylint.extensions.code_style",
+    "pylint.extensions.overlapping_exceptions",
+    "pylint.extensions.typing",
+    "pylint.extensions.redefined_variable_type",
+    "pylint.extensions.comparison_placement",
+]
+py-version = "3.12"
+extension-pkg-allow-list = "ujson"
+
+[tool.pylint."MESSAGES CONTROL"]
+disable = [
+    "attribute-defined-outside-init",
+    "invalid-name",
+    "missing-docstring",
+    "protected-access",
+    "too-few-public-methods",
+    "format",
+    "similarities",
+    "fixme",
+    "chained-comparison",
+    "too-many-ancestors",
+    "use-set-for-membership",
+    "wildcard-import",
+    "unused-wildcard-import",
+    "consider-using-assignment-expr",
+    "invalid-str-returned",
+    "consider-using-namedtuple-or-dataclass",
+    "no-member",
+    "too-many-locals",
+    "too-many-branches",
+    "abstract-method",
+    "missing-param-doc",
+    "too-many-return-statements",
+    "too-many-instance-attributes",
+    "too-many-arguments",
+    "too-many-statements",
+    "too-many-public-methods",
+    "raise-missing-from",
+]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
