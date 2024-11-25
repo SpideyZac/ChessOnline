@@ -23,7 +23,7 @@ lint = "pylint ./src/**/*.py"
 imports = "isort ./src --check"
 types = "mypy ./src/**/*.py"
 format = "black --check ./src/**/*.py"
-start = "python ./src/main.py"
+start-server = "python ./src/server/main.py"
 
 [tool.poe.tasks.check]
 sequence = ["lint", "imports", "types", "format"]
