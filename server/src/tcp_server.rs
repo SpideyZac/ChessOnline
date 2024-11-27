@@ -32,16 +32,16 @@ impl TCPServer {
 
     pub async fn start(self: Arc<Self>, addr: &str) -> tokio::io::Result<()> {
         let listener = TcpListener::bind(addr).await?;
-        println!("Server running on {}", addr);
+        println!("TCP Server: Server running on {}", addr);
 
         loop {
             match listener.accept().await {
                 Ok((socket, addr)) => {
-                    println!("Client connected: {}", addr);
+                    println!("TCP Server: Client connected: {}", addr);
                     self.clone().handle_client(socket, addr).await;
                 }
                 Err(e) => {
-                    eprintln!("Failed to accept connection: {}", e);
+                    eprintln!("TCP Server: Failed to accept connection: {}", e);
                 }
             }
         }
@@ -61,7 +61,7 @@ impl TCPServer {
             loop {
                 match reader.read(&mut buffer).await {
                     Ok(0) => {
-                        println!("Client disconnected: {}", addr);
+                        println!("TCP Server: Client disconnected: {}", addr);
                         server.clients.lock().unwrap().remove(&addr);
                         let _ = server
                             .event_sender
@@ -75,7 +75,7 @@ impl TCPServer {
                             .send(ServerEvent::ClientDataReceived { addr, data });
                     }
                     Err(e) => {
-                        eprintln!("Error reading from client {}: {}", addr, e);
+                        eprintln!("TCP Server: Error reading from client {}: {}", addr, e);
                         server.clients.lock().unwrap().remove(&addr);
                         let _ = server
                             .event_sender
@@ -101,7 +101,7 @@ impl TCPServer {
     pub async fn send_to_multiple(&self, addrs: &[SocketAddr], data: &[u8]) {
         for addr in addrs {
             if let Err(e) = self.send_to(addr, data).await {
-                eprintln!("Failed to send to {}: {}", addr, e);
+                eprintln!("TCP Server: Failed to send to {}: {}", addr, e);
             }
         }
     }
@@ -109,7 +109,7 @@ impl TCPServer {
     pub async fn broadcast(&self, data: &[u8]) {
         for writer in self.clients.lock().unwrap().values_mut() {
             if let Err(e) = writer.write_all(data).await {
-                eprintln!("Broadcast error: {}", e);
+                eprintln!("TCP Server: Broadcast error: {}", e);
             }
         }
     }
