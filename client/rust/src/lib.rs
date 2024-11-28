@@ -1,14 +1,8 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+mod player;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+use godot::prelude::*;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+struct Extension;
+
+#[gdextension]
+unsafe impl ExtensionLibrary for Extension {}
