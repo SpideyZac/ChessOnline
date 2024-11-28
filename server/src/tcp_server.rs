@@ -69,6 +69,7 @@ impl TCPServer {
                         break;
                     }
                     Ok(n) => {
+                        println!("TCP Server: Received {} bytes from client {}", n, addr);
                         let data = buffer[..n].to_vec();
                         let _ = server
                             .event_sender
