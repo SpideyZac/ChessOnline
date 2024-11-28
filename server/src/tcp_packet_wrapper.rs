@@ -71,23 +71,38 @@ impl TCPPacketWrapper {
         self.listen_for_events().await;
     }
 
+    fn create_wrapper(packet: &dyn Packet) -> Vec<u8> {
+        let packet_type = packet.packet_type_self().to_string();
+        let data = packet.encode();
+        let packet_wrapper = PacketWrapper { packet_type, data };
+        bincode::serialize(&packet_wrapper).unwrap()
+    }
+
     pub async fn send_packet(
         &self,
         addr: &SocketAddr,
         packet: &dyn Packet,
     ) -> tokio::io::Result<()> {
-        let packet_wrapper = PacketWrapper {
-            packet_type: packet.packet_type_self().to_string(),
-            data: packet.encode(),
-        };
+        let packet_wrapper = Self::create_wrapper(packet);
+        self.server.send_to(addr, packet_wrapper.as_slice()).await
+    }
 
-        let data = bincode::serialize(&packet_wrapper).map_err(|e| {
-            tokio::io::Error::new(
-                tokio::io::ErrorKind::InvalidData,
-                format!("Serialization error: {}", e),
-            )
-        })?;
-        self.server.send_to(addr, &data).await
+    pub async fn send_multiple_packet(
+        &self,
+        addrs: &[SocketAddr],
+        packet: &dyn Packet,
+    ) -> tokio::io::Result<()> {
+        let packet_wrapper = Self::create_wrapper(packet);
+        self.server
+            .send_to_multiple(addrs, packet_wrapper.as_slice())
+            .await;
+        Ok(())
+    }
+
+    pub async fn broadcast_packet(&self, packet: &dyn Packet) -> tokio::io::Result<()> {
+        let packet_wrapper = Self::create_wrapper(packet);
+        self.server.broadcast(packet_wrapper.as_slice()).await;
+        Ok(())
     }
 
     async fn listen_for_events(self: Arc<Self>) {
