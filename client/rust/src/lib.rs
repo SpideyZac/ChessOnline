@@ -1,5 +1,3 @@
-mod player;
-
 use godot::prelude::*;
 
 struct Extension;
